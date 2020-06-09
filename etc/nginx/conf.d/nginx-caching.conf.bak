@@ -1,0 +1,50 @@
+
+# Below line is to cache images
+proxy_cache_path /var/cache/nginx keys_zone=imgcache:100m;
+
+upstream cached{
+    server www.stcars.sg:443;
+}
+
+server {
+    listen 443 ssl default_server;
+    status_zone cache_http;
+	
+    ssl_certificate /etc/nginx/ssl/example.com.crt;
+	ssl_certificate_key /etc/nginx/ssl/example.com.key;
+
+    location / {
+        proxy_pass https://cached;
+
+        # Below two lines are to enable keepalive connections
+        proxy_http_version 1.1;
+        #proxy_set_header Connection "";
+        #proxy_set_header X-Forwarded-For $remote_addr;
+    }
+
+    # Below location block is to cache images
+    location ~ (\.js) {
+    return 403;
+    }
+
+    location ~* \.(thumb|zip|jpg|jpeg|png|gif|ico)$ {
+        add_header X-Cache-Status $upstream_cache_status;
+        proxy_cache imgcache;
+        proxy_cache_valid any 1h;
+
+        proxy_ignore_headers Cache-Control;
+        proxy_ignore_headers Expires;
+        proxy_hide_header Cache-Control;
+        proxy_hide_header Expires;
+        #return 403;
+        proxy_pass https://cached;
+    }
+}
+#See full documentation: https://docs.nginx.com/nginx/admin-guide/content-cache/content-caching/ 
+#* **proxy_cache:** This directive defines a shared memory zone (`imgcache` in our case) used for caching. The same zone can be used in several places.
+
+#* **proxy_cache_valid:** This directive sets caching time for different response codes. Eg. `proxy_cache_valid any 1h;`
+
+#* **proxy_ignore_headers:** This directive is used to disable processing of certain response header fields from the proxied servers.
+
+#* **proxy_hide_header:** This directive is used to hide/not pass additional fields as part of the response header.
