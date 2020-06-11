@@ -1,9 +1,9 @@
 FROM ubuntu:bionic
 
-LABEL maintainer="jessegoodier@gmail.com"
+LABEL maintainer="jesse.goodier@nginx.com"
 
 # Set Nginx Plus version
-ENV NGINX_PLUS_VERSION 21
+ENV NGINX_PLUS_VERSION 22
 
 ## Install Nginx Plus
  # Download certificate and key from the customer portal https://cs.nginx.com
@@ -15,7 +15,7 @@ RUN chmod 644 /etc/ssl/nginx/* \
 # Install prerequisite packages, vim for editing, then Install NGINX Plus
   && set -x \
   && apt-get update && apt-get upgrade -y \
-  && apt-get install --no-install-recommends --no-install-suggests -y apt-transport-https ca-certificates gnupg1 curl python2.7 procps net-tools vim-tiny joe jq less git openssh-server openssh-client sudo iproute2 \
+  && apt-get install --no-install-recommends --no-install-suggests -y apt-transport-https ca-certificates gnupg1 curl python2.7 procps net-tools vim-tiny joe jq less git openssh-client sudo iproute2 \
   && \
   NGINX_GPGKEY=573BFD6B3D8FBC641079A6ABABF5BD827BD9BF62; \
   found=''; \
@@ -59,40 +59,14 @@ RUN chown -R nginx:nginx /etc/nginx \
  && ln -sf /dev/stdout /var/log/nginx/access.log \
  && ln -sf /dev/stderr /var/log/nginx/error.log \
  # Raise the limits to successfully run benchmarks
- && ulimit -c -m -s -t unlimited 
+ && ulimit -c -m -s -t unlimited \
  # Remove the cert/keys from the image
- #&& rm /etc/ssl/nginx/nginx-repo.crt /etc/ssl/nginx/nginx-repo.key
+ && rm /etc/ssl/nginx/nginx-repo.crt /etc/ssl/nginx/nginx-repo.key
 
-#add ubuntu and workshop users for testing
-RUN useradd -m ubuntu && echo "ubuntu:ubuntu" | chpasswd && adduser ubuntu sudo
-COPY authorized_keys /home/ubuntu/.ssh/authorized_keys
-RUN mkdir -p /home/ubuntu/.ssh
-RUN chmod 400 /home/ubuntu/.ssh/authorized_keys
-RUN chown -R ubuntu:ubuntu /home/ubuntu/.ssh/
-RUN echo "ubuntu ALL=(ALL) NOPASSWD: ALL" >>/etc/sudoers
-
-RUN useradd -m workshop && echo "workshop:workshop" | chpasswd && adduser workshop sudo
-RUN mkdir -p /home/workshop/.ssh
-COPY authorized_keys /home/workshop/.ssh/authorized_keys
-RUN chmod 400 /home/workshop/.ssh/authorized_keys
-RUN chown -R workshop:workshop /home/workshop/.ssh/
-RUN echo "workshop ALL=(ALL) NOPASSWD: ALL" >>/etc/sudoers
-
-RUN mkdir /var/run/sshd
-
-RUN echo 'root:root' |chpasswd
-
-RUN sed -ri 's/^#?PermitRootLogin\s+.*/PermitRootLogin yes/' /etc/ssh/sshd_config
-RUN sed -ri 's/UsePAM yes/#UsePAM yes/g' /etc/ssh/sshd_config
-
-RUN mkdir /root/.ssh
-COPY authorized_keys /root/.ssh/authorized_keys
-RUN chmod 400 /root/.ssh/authorized_keys
 RUN apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-EXPOSE 22 80 443 8080
+EXPOSE 80 443 8080
 STOPSIGNAL SIGTERM
-COPY sshd-nginx.sh sshd-nginx.sh
-CMD /bin/sh /sshd-nginx.sh
-#CMD    ["/usr/sbin/sshd", "-D"]
+
+CMD ["nginx", "-g", "daemon off;"]
