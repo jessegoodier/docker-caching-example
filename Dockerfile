@@ -49,8 +49,8 @@ RUN chmod 644 /etc/ssl/nginx/* \
 
 # Optional: COPY over any of your SSL certs for HTTPS servers
 # e.g.
-#COPY etc/ssl/www.example.com.crt /etc/ssl/www.example.com.crt
-#COPY etc/ssl/www.example.com.key /etc/ssl/www.example.com.key
+COPY etc/ssl/example.com.crt /etc/ssl/example.com.crt
+COPY etc/ssl/example.com.key /etc/ssl/example.com.key
 
 # COPY /etc/nginx (Nginx configuration) directory
 COPY etc/nginx /etc/nginx
