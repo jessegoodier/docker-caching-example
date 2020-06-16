@@ -5,8 +5,8 @@ edit etc/nginx/conf.d/cdn.conf with your specific needs. especially the server i
 
 Then:
 
-sudo rm -rf var/cache/nginx/* #remove cache directories before build
 
-docker build --tag=nginx-cacher .
+#remove cache directories before build
+sudo rm -rf var/cache/nginx/*
 
-docker run -p 80:80 -p 443:443 -p 8080:8080 -v $PWD/etc/nginx:/etc/nginx -v $PWD/var/cache/nginx:/var/cache/nginx -it --name=nginx-cacher nginx-cacher:latest
+docker run -it -p 80:80 -p 443:443 -p 8080:8080 --volume $PWD/etc/nginx:/etc/nginx --volume $PWD/var/cache/nginx:/var/cache/nginx --name=nginx-cdn nginx-cdn:latest
