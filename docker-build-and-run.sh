@@ -2,6 +2,13 @@
 set -e
 #remove cache directories before build
 sudo rm -rf var/cache/nginx/*
-docker build --tag=nginx-cacher .
-docker rm -f nginx-cacher
-docker run -p 80:80 -p 443:443 -p 8080:8080 -v $PWD/etc/nginx:/etc/nginx -v $PWD/var/cache/nginx:/var/cache/nginx -it --name=nginx-cacher nginx-cacher:latest
+docker build --tag=nginx-cdn .
+
+#check if container exists and remove if so
+if [ -n "$( docker container ls --all --quiet --filter name=nginx-cdn )" ]; then
+  echo "Container exists, removing"
+  docker rm -f nginx-cdn;
+fi
+
+#pass the ports and volumes
+docker run -it -p 80:80 -p 443:443 -p 8080:8080 --volume $PWD/etc/nginx:/etc/nginx --volume $PWD/var/cache/nginx:/var/cache/nginx --name=nginx-cdn nginx-cdn:latest
