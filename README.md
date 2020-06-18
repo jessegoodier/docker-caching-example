@@ -27,4 +27,4 @@ sudo rm -rf var/cache/nginx/*
 docker run -it -p 80:80 -p 443:443 -p 8080:8080 --volume $PWD/etc/nginx:/etc/nginx --volume $PWD/var/cache/nginx:/var/cache/nginx --name=nginx-cdn nginx-cdn:latest
 
 
-[CDN Testing](NGINX_CDN_Demo_curl_wget_purge_test.jpg)
+![](NGINX_CDN_Demo_curl_wget_purge_test.png)
