@@ -14,9 +14,9 @@ NGINX Plus dashboard: <http://aws-ohio.nginx.rocks:8080/>
 Also explore the API for additional metrics:
 >curl http://aws-ohio.nginx.rocks:8080/api/1 |jq
 
->wget aws-ohio.nginx.rocks/images/2019-12-02-18h19m33.jpg -O /dev/null
+>wget http://aws-ohio.nginx.rocks/images/2019-11-29-10h47m11.jpg -O /dev/null
 
->curl -X PURGE -D – "http://aws-ohio.nginx.rocks/*"
+>curl -X PURGE -D - "http://aws-ohio.nginx.rocks/*"
 
 https is enabled also:
 Demo site with a lot of latency: <https://aws-singapore.nginx.rocks/>
